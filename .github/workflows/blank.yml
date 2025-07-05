@@ -3,10 +3,10 @@ on:
   repository_dispatch:
     types:
       - wxWidget-3.2.6
-  # push:
-  #   branches: [ widget ]
-  # pull_request:
-  #   branches: [ widget ]
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 jobs:
   msw-msvs:
     runs-on: windows-${{ matrix.vsversion }}
