@@ -126,6 +126,20 @@ jobs:
           cd build
           cmake ../ -G "Visual Studio 17 2022" 
 
+      - name: Download External Lib
+        working-directory: ${{ env.work_directory }}
+        run: |
+          set PYTHONIOENCODING=utf-8
+          cd tools/external_lib
+          pip install -r requirements.txt
+          python download.py --arch x64 --build_types dbg --mul
+          python download.py --arch x64 --build_types rel --mul
+
+
+      - name: Build with MSBuild
+        run: msbuild -m -t:Build -p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} detection-continuity/build/detecter.sln
+
+
       # - name: Build
       #   working-directory: ${{ env.work_directory }}
       #   run: |
