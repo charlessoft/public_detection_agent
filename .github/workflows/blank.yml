@@ -140,6 +140,37 @@ jobs:
         run: msbuild -m -t:Build -p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} detection-continuity/build/detecter.sln
 
 
+      - name: Check Status
+        if: ${{ success() }}
+        shell: pwsh
+        run: |
+          $repoName = $env:GITHUB_REPOSITORY.Split('/')[-1]
+          Write-Host "Workflow succeeded for $repoName!"
+          # dding "github action success :) for $repoName"
+          
+
+      - name: Check Status
+        if: ${{ failure() }}
+        shell: pwsh
+        run: |
+          $repoName = $env:GITHUB_REPOSITORY.Split('/')[-1]
+          Write-Host "Workflow failed for $repoName!"
+          # dding "github action fail :( $repoName"
+
+      - name: Ls dir
+          run: |
+            echo "%cd%"
+            dir
+            cd detection-continuity
+            dir 
+
+      - name: Archive binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: librel64
+          path: |
+            detection-continuity\librel64
+          retention-days: 1 # <= 这里可以设置保留天数
       # - name: Build
       #   working-directory: ${{ env.work_directory }}
       #   run: |
@@ -223,190 +254,64 @@ jobs:
   #         retention-days: 1
 
 
-  # create-release:
-  #   runs-on: ubuntu-latest
-  #   needs: msw-msvs
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
+  create-release:
+    runs-on: ubuntu-latest
+    needs: msw-msvs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  #     - name: Set up environment
-  #       run: echo "RELEASE_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+      - name: Set up environment
+        run: echo "RELEASE_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
 
-  #     - name: Install GitHub CLI
-  #       uses: sersoft-gmbh/setup-gh-cli-action@v2
+      - name: Install GitHub CLI
+        uses: sersoft-gmbh/setup-gh-cli-action@v2
 
-  #     - name: Delete existing release
-  #       env:
-  #         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       run: gh release delete $RELEASE_DATE --yes || true
+      - name: Delete existing release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release delete $RELEASE_DATE --yes || true
 
-  #     - name: Create new release
-  #       env:
-  #         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       run: gh release create $RELEASE_DATE -t "Release $RELEASE_DATE" -n "Automated release for $RELEASE_DATE"
-
-
-  #     - name: Download Artifacts
-        
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         path: ./artifacts
-
-  #     - name: Compress Artifacts
-  #       working-directory: ${{ env.work_directory }}
-  #       run: |
-  #         cd ./artifacts/vc_lib_dbg_win32
-  #         zip -r ../vc_lib_dbg_win32.zip ./*
-
-  #         cd ../vc_lib_rel_win32
-  #         zip -r ../vc_lib_rel_win32.zip ./*
-
-  #         cd ../vc_lib_dbg_x64
-  #         zip -r ../vc_lib_dbg_x64.zip ./*
-
-  #         cd ../vc_lib_rel_x64
-  #         zip -r ../vc_lib_rel_x64.zip ./*
+      - name: Create new release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create $RELEASE_DATE -t "Release $RELEASE_DATE" -n "Automated release for $RELEASE_DATE"
 
 
-  #         # zip -r ./vc_lib_dbg_win32.zip ./vc_lib_dbg_win32
-  #         # zip -r ./vc_lib_rel_win32.zip ./vc_lib_rel_win32
-  #         # zip -r ./vc_lib_dbg_x64.zip ./vc_lib_dbg_x64
-  #         # zip -r ./vc_lib_rel_x64.zip ./vc_lib_rel_x64
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
 
-  #     - name: Generate MD5 Checksums
-  #       working-directory: ${{ env.work_directory }}
-  #       run: |
-  #         > ./artifacts/filelist.txt  # 清空或创建 filelist.txt 文件
-  #         for file in ./artifacts/*.zip; do
-  #           # Calculate MD5 checksum
-  #           md5sum=$(md5sum "$file" | awk '{ print $1 }')
+      - name: zip Artifacts
+        run: |
+          ls ./artifacts
+          cd ./artifacts
+          mv librel64 DetectionContinuity
+          zip -r DetectionContinuity.zip DetectionContinuity
+          
+          
+          
+      - name: Generate MD5 Checksums
+        run: |
+          > ./artifacts/filelist.txt  # 清空或创建 filelist.txt 文件
+          for file in ./artifacts/*.{zip,exe}; do
+            # Calculate MD5 checksum
+            md5sum=$(md5sum "$file" | awk '{ print $1 }')
+      
+            # Write to filelist.txt
+            echo "$(basename "$file") | ${md5sum}" >> ./artifacts/filelist.txt
+          done
 
-  #           # Write to filelist.txt
-  #           echo "$(basename "$file") | ${md5sum}" >> ./artifacts/filelist.txt
-  #         done
-
-  #     - name: Upload Artifacts to Release
-  #       working-directory: ${{ env.work_directory }}
-  #       env:
-  #         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       run: |
-  #         cd ./artifacts
-  #         gh release upload $RELEASE_DATE ./vc_lib_dbg_win32.zip
-  #         gh release upload $RELEASE_DATE ./vc_lib_rel_win32.zip
-  #         gh release upload $RELEASE_DATE ./vc_lib_dbg_x64.zip
-  #         gh release upload $RELEASE_DATE ./vc_lib_rel_x64.zip
-  #         gh release upload $RELEASE_DATE ./filelist.txt
-
-      # - name: Upload artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: vc_lib_${{ matrix.configuration | toLower }}_${{ matrix.platform | toLower }}
-      #     path: ${{env.work_directory}}/package
-      #     retention-days: 1
-
-  # create-release:
-  #   runs-on: ubuntu-latest
-  #   needs: msw-msvs
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-
-  #     - name: Set up environment
-  #       run: echo "RELEASE_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
-
-  #     - name: Install GitHub CLI
-  #       uses: sersoft-gmbh/setup-gh-cli-action@v2
-
-  #     - name: Delete existing release
-  #       env:
-  #         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       run: gh release delete $RELEASE_DATE --yes || true
-
-  #     - name: Create new release
-  #       env:
-  #         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       run: gh release create $RELEASE_DATE -t "Release $RELEASE_DATE" -n "Automated release for $RELEASE_DATE"
-
-  #     - name: Download Artifacts
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         path: ./artifacts
-
-  #     - name: Compress Artifacts
-  #       run: |
-  #         cd ./artifacts
-  #         for dir in vc_lib_dbg_win32 vc_lib_rel_win32 vc_lib_dbg_x64 vc_lib_rel_x64; do
-  #           zip -r "${dir}.zip" "./${dir}"
-  #         done
-
-  #     - name: Generate MD5 Checksums
-  #       run: |
-  #         > ./artifacts/filelist.txt  # 清空或创建 filelist.txt 文件
-  #         for file in ./artifacts/*.zip; do
-  #           # Calculate MD5 checksum
-  #           md5sum=$(md5sum "$file" | awk '{ print \$1 }')
-
-  #           # Write to filelist.txt
-  #           echo "$(basename "$file") | ${md5sum}" >> ./artifacts/filelist.txt
-  #         done
-
-  #     - name: Upload Artifacts to Release
-  #       env:
-  #         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       run: |
-  #         cd ./artifacts
-  #         for file in *.zip filelist.txt; do
-  #           gh release upload $RELEASE_DATE "$file"
-  #         done
-  #         gh release upload $RELEASE_DATE ./filelist.txt
-
-
-
-
-      # - name: Download Artifacts
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     path: ./artifacts
-
-      # - name: Compress Artifacts
-      #   run: |
-      #     cd ./artifacts/vc_lib_dbg_win32
-      #     zip -r ../vc_lib_dbg_win32.zip ./*
-
-      #     cd ../vc_lib_rel_win32
-      #     zip -r ../vc_lib_rel_win32.zip ./*
-
-      #     cd ../vc_lib_dbg_x64
-      #     zip -r ../vc_lib_dbg_x64.zip ./*
-
-      #     cd ../vc_lib_rel_x64
-      #     zip -r ../vc_lib_rel_x64.zip ./*
-
-
-      #     # zip -r ./vc_lib_dbg_win32.zip ./vc_lib_dbg_win32
-      #     # zip -r ./vc_lib_rel_win32.zip ./vc_lib_rel_win32
-      #     # zip -r ./vc_lib_dbg_x64.zip ./vc_lib_dbg_x64
-      #     # zip -r ./vc_lib_rel_x64.zip ./vc_lib_rel_x64
-
-      # - name: Generate MD5 Checksums
-      #   run: |
-      #     > ./artifacts/filelist.txt  # 清空或创建 filelist.txt 文件
-      #     for file in ./artifacts/*.zip; do
-      #       # Calculate MD5 checksum
-      #       md5sum=$(md5sum "$file" | awk '{ print $1 }')
-
-      #       # Write to filelist.txt
-      #       echo "$(basename "$file") | ${md5sum}" >> ./artifacts/filelist.txt
-      #     done
-
-      # - name: Upload Artifacts to Release
-      #   env:
-      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   run: |
-      #     cd ./artifacts
-      #     gh release upload $RELEASE_DATE ./vc_lib_dbg_win32.zip
-      #     gh release upload $RELEASE_DATE ./vc_lib_rel_win32.zip
-      #     gh release upload $RELEASE_DATE ./vc_lib_dbg_x64.zip
-      #     gh release upload $RELEASE_DATE ./vc_lib_rel_x64.zip
-      #     gh release upload $RELEASE_DATE ./filelist.txt
+      - name: Upload Artifacts to Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd ./artifacts
+          gh release upload $RELEASE_DATE ./*.zip
+          gh release upload $RELEASE_DATE filelist.txt
+          
+      - name: LS Artifacts
+        run: |
+          ls 
+          ls ./artifacts
