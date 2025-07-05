@@ -1,4 +1,4 @@
-name: wxWidget-3.2.6
+name: detection
 on:
   repository_dispatch:
     types:
