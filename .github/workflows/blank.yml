@@ -158,11 +158,11 @@ jobs:
           # dding "github action fail :( $repoName"
 
       - name: Ls dir
-          run: |
-            echo "%cd%"
-            dir
-            cd detection-continuity
-            dir 
+        run: |
+          echo "%cd%"
+          dir
+          cd detection-continuity
+          dir 
 
       - name: Archive binaries
         uses: actions/upload-artifact@v4
