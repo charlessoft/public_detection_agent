@@ -156,7 +156,8 @@ jobs:
       - name: Run Tests
         run: |
           cd detection-continuity/test-prj/librel64
-          gtest.exe
+          dir
+          ./gtest.exe
 
       - name: Check Status
         if: ${{ success() }}
