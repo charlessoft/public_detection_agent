@@ -91,7 +91,8 @@ jobs:
         shell: pwsh
         run: |
           $env:GIT_TRACE = "1"
-          git clone git@github.com:charlessoft/detection-continuity.git  $env:work_directory
+          # git clone git@github.com:charlessoft/detection-continuity.git  $env:work_directory
+          git clone https://oauth2:${{ secrets.charlessoft_TOKEN }}@github.com/charlessoft/detection-continuity.git
 
 
 
