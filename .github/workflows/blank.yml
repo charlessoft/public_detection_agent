@@ -9,7 +9,7 @@ on:
     branches: [ main ]
 jobs:
   msw-msvs:
-    runs-on: windows-2019
+    runs-on: windows-${{ matrix.vsversion }}
     name: wxMSW vs${{ matrix.vsversion }} ${{ matrix.configuration }} ${{ matrix.platform }}
     strategy:
       fail-fast: false
@@ -119,7 +119,7 @@ jobs:
           dir 
           mkdir build
           cd build
-          cmake ../ -G "Visual Studio 16 2019" 
+          cmake ../ -G "Visual Studio 17 2022" 
 
       # - name: Build
       #   working-directory: ${{ env.work_directory }}
