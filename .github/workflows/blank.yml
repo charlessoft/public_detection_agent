@@ -20,7 +20,7 @@ jobs:
           #   vsversion: 2019
           - configuration: 'Release'
             platform: 'x64'
-            vsversion: 2019
+            vsversion: 2022 
     env:
       work_directory: detection-continuity  # 设置环境变量
     steps:
