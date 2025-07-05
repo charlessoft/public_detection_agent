@@ -140,6 +140,25 @@ jobs:
         run: msbuild -m -t:Build -p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} detection-continuity/build/detecter.sln
 
 
+
+      - name: Test with CTest
+        working-directory: ${{ env.work_directory }}
+        shell: powershell
+        run: |
+          cd test-prj
+          mkdir build
+          cd build
+          cmake ../ -G "Visual Studio 17 2022" 
+
+      - name: Build with Gtest MSBuild
+        run: msbuild -m -t:Build -p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} detection-continuity/test-prj/build/gtest.sln
+
+
+      - name: Run Tests
+        run: |
+          cd detection-continuity/test-prj/librel64
+          gtest.exe
+
       - name: Check Status
         if: ${{ success() }}
         shell: pwsh
