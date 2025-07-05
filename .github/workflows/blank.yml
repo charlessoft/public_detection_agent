@@ -2,7 +2,7 @@ name: detection
 on:
   repository_dispatch:
     types:
-      - wxWidget-3.2.6
+      - public_detection_agent
   push:
     branches: [ main ]
   pull_request:
