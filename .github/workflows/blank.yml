@@ -107,13 +107,13 @@ jobs:
       #         Set-Content setup.h
       #       }
 
-      - name: Setup VS2019
-        uses: warrenbuckley/Setup-MSBuild@v1
+      # - name: Setup VS2019
+      #   uses: warrenbuckley/Setup-MSBuild@v1
 
-      # - name: Add MSBuild to PATH
-      #   uses: microsoft/setup-msbuild@v2
-      #   with:
-      #       vs-prerelease: true
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+        with:
+            vs-prerelease: true
 
       - name: CMake
         working-directory: ${{ env.work_directory }}
