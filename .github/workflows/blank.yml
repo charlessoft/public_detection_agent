@@ -140,7 +140,6 @@ jobs:
         run: msbuild -m -t:Build -p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} detection-continuity/build/detecter.sln
 
 
-
       - name: Test with CTest
         working-directory: ${{ env.work_directory }}
         shell: powershell
