@@ -117,9 +117,9 @@ jobs:
         run: |
           pwd
           dir 
-      # mkdir build
-      # cd build
-      # cmake ../ -G "Visual Studio 16 2019" 
+          mkdir build
+          cd build
+          cmake ../ -G "Visual Studio 16 2019" 
 
       # - name: Build
       #   working-directory: ${{ env.work_directory }}
