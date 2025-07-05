@@ -45,46 +45,46 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.11'
+      # - name: Set up Python
+      #   uses: actions/setup-python@v2
+      #   with:
+      #     python-version: '3.11'
 
-      - name: Install dding on non-Windows
-        if: runner.os != 'Windows'
-        run: |
-          pip install dding
-          mkdir -p ~/.dding
-          dding_secret="${{ github.event.client_payload.dding_secret || env.DEFAULT_DDING_SECRET }}"
-          dding_token="${{ github.event.client_payload.dding_token || env.DEFAULT_DDING_TOKEN }}"
-          cat <<EOF > ~/.dding/config.json
-          [
-              {
-                  "group": "default",
-                  "secret": "$dding_secret",
-                  "token": "$dding_token"
-              }
-          ]
-          EOF
+      # - name: Install dding on non-Windows
+      #   if: runner.os != 'Windows'
+      #   run: |
+      #     pip install dding
+      #     mkdir -p ~/.dding
+      #     dding_secret="${{ github.event.client_payload.dding_secret || env.DEFAULT_DDING_SECRET }}"
+      #     dding_token="${{ github.event.client_payload.dding_token || env.DEFAULT_DDING_TOKEN }}"
+      #     cat <<EOF > ~/.dding/config.json
+      #     [
+      #         {
+      #             "group": "default",
+      #             "secret": "$dding_secret",
+      #             "token": "$dding_token"
+      #         }
+      #     ]
+      #     EOF
 
-      - name: Install dding on Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          pip install dding
-          New-Item -Path $HOME\.dding -ItemType Directory -Force
-          $dding_secret = "${{ github.event.client_payload.dding_secret || env.DEFAULT_DDING_SECRET }}"
-          $dding_token = "${{ github.event.client_payload.dding_token || env.DEFAULT_DDING_TOKEN }}"
-          $config = @"
-          [
-              {
-                  "group": "default",
-                  "secret": "$dding_secret",
-                  "token": "$dding_token"
-              }
-          ]
-          "@
-          $config | Out-File -FilePath $HOME\.dding\config.json -Encoding utf8
+      # - name: Install dding on Windows
+      #   if: runner.os == 'Windows'
+      #   shell: pwsh
+      #   run: |
+      #     pip install dding
+      #     New-Item -Path $HOME\.dding -ItemType Directory -Force
+      #     $dding_secret = "${{ github.event.client_payload.dding_secret || env.DEFAULT_DDING_SECRET }}"
+      #     $dding_token = "${{ github.event.client_payload.dding_token || env.DEFAULT_DDING_TOKEN }}"
+      #     $config = @"
+      #     [
+      #         {
+      #             "group": "default",
+      #             "secret": "$dding_secret",
+      #             "token": "$dding_token"
+      #         }
+      #     ]
+      #     "@
+      #     $config | Out-File -FilePath $HOME\.dding\config.json -Encoding utf8
 
 # 下载代码============================================
       - name: Clone repository from github with trace
@@ -116,9 +116,10 @@ jobs:
         shell: powershell
         run: |
           pwd
-          dir 
-          cd build
-          cmake ../ -G "Visual Studio 16 2019" 
+      # dir 
+      # mkdir build
+      # cd build
+      # cmake ../ -G "Visual Studio 16 2019" 
 
       # - name: Build
       #   working-directory: ${{ env.work_directory }}
