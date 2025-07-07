@@ -45,10 +45,10 @@ jobs:
         with:
           submodules: recursive
 
-      # - name: Set up Python
-      #   uses: actions/setup-python@v2
-      #   with:
-      #     python-version: '3.11'
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
 
       # - name: Install dding on non-Windows
       #   if: runner.os != 'Windows'
@@ -140,7 +140,7 @@ jobs:
         run: msbuild -m -t:Build -p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} detection-continuity/build/detecter.sln
 
 
-      - name: Test with CTest
+      - name: Build with CTest
         working-directory: ${{ env.work_directory }}
         shell: powershell
         run: |
@@ -153,21 +153,24 @@ jobs:
         run: msbuild -m -t:Build -p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} detection-continuity/test-prj/build/gtest.sln
 
 
-      - name: Run Tests
+      - name: Run Gtest Tests
         run: |
           cd detection-continuity/test-prj/librel64
           dir
           ./gtest.exe
+          dir detection-continuity/test-prj/librel64
 
       - name: Run Python Tests
         run: |
           cd detection-continuity
+          pip install -r requirements.txt
           set PYTHONPATH=%cd%
           cd tests
           python -m unittest discover -s . -p "*.py" || true
       
       - name: Check C++ Python log compare
         run: |
+          dir detection-continuity/test-prj/librel64
           $file1 = "detection-continuity/test-prj/librel64/c++.log"
           $file2 = "detection-continuity/tests/py.log"
 
