@@ -159,6 +159,33 @@ jobs:
           dir
           ./gtest.exe
 
+      - name: Run Python Tests
+        run: |
+          cd detection-continuity
+          set PYTHONPATH=%cd%
+          cd tests
+          python -m unittest discover -s . -p "*.py" || true
+      
+      - name: Check C++ Python log compare
+        run: |
+          $file1 = "detection-continuity/test-prj/librel64/c++.log"
+          $file2 = "detection-continuity/tests/py.log"
+
+          # Calculate MD5 hash for the first file
+          $hash1 = Get-FileHash -Path $file1 -Algorithm MD5
+          # Calculate MD5 hash for the second file
+          $hash2 = Get-FileHash -Path $file2 -Algorithm MD5
+
+          # Compare the hashes
+          if ($hash1.Hash -eq $hash2.Hash) {
+            Write-Host "The files have the same MD5 hash."
+          } else {
+            Write-Host "The files have different MD5 hashes."
+            exit 1
+          }
+
+
+
       - name: Check Status
         if: ${{ success() }}
         shell: pwsh
