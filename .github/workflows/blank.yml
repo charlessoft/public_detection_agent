@@ -163,12 +163,14 @@ jobs:
       - name: Run Python Tests
         shell: cmd
         run: |
-          cd detection-continuity/py 
-          pip install -r requirements.txt
-          cd ..
+          cd detection-continuity
+          dir
           set PYTHONPATH=%cd%
           echo "%PYTHONPATH%"
-          cd tests
+          cd py
+          pip install -r requirements.txt
+          cd ../tests
+          echo "%PYTHONPATH%"
           python -m unittest discover -s . -p "*.py" || true
       
       - name: Check C++ Python log compare
