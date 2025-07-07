@@ -153,7 +153,7 @@ jobs:
         run: msbuild -m -t:Build -p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} detection-continuity/test-prj/build/gtest.sln
 
 
-      - name: Run Gtest Tests
+      - name: Run GTest Tests
         run: |
           cd detection-continuity/test-prj/librel64
           dir
@@ -161,11 +161,13 @@ jobs:
           dir 
 
       - name: Run Python Tests
+        shell: cmd
         run: |
           cd detection-continuity/py 
           pip install -r requirements.txt
           cd ..
           set PYTHONPATH=%cd%
+          echo "%PYTHONPATH%"
           cd tests
           python -m unittest discover -s . -p "*.py" || true
       
