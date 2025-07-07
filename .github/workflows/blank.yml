@@ -162,8 +162,9 @@ jobs:
 
       - name: Run Python Tests
         run: |
-          cd detection-continuity
+          cd detection-continuity/py 
           pip install -r requirements.txt
+          cd ..
           set PYTHONPATH=%cd%
           cd tests
           python -m unittest discover -s . -p "*.py" || true
