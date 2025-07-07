@@ -158,7 +158,7 @@ jobs:
           cd detection-continuity/test-prj/librel64
           dir
           ./gtest.exe
-          dir detection-continuity/test-prj/librel64
+          dir 
 
       - name: Run Python Tests
         run: |
