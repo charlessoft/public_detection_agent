@@ -7,6 +7,13 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+env:
+# game
+  # DEFAULT_DDING_SECRET: 'SEC618a0dffd91ebf7db4c9c00e2a82b863bc6181858cadbdbf1655ca6dcd2fd1cc'
+  # DEFAULT_DDING_TOKEN: '4e27925ce9df0372171763c071b36bb442cdbf296f315484b9cb165f331da225'
+  # DEFAULT_DDING_SECRET: 'SECbe4003c4d14c740788cf9383fa1d8d77c029a03e6df99dde528274b9bcc17926'
+  # DEFAULT_DDING_TOKEN: 'fd87df4f83611b4c4cf31d5ad48f890f9603b57b1cac3d52fb80df8b86a5b629'
+
 jobs:
   msw-msvs:
     runs-on: windows-${{ matrix.vsversion }}
@@ -50,41 +57,41 @@ jobs:
         with:
           python-version: '3.11'
 
-      # - name: Install dding on non-Windows
-      #   if: runner.os != 'Windows'
-      #   run: |
-      #     pip install dding
-      #     mkdir -p ~/.dding
-      #     dding_secret="${{ github.event.client_payload.dding_secret || env.DEFAULT_DDING_SECRET }}"
-      #     dding_token="${{ github.event.client_payload.dding_token || env.DEFAULT_DDING_TOKEN }}"
-      #     cat <<EOF > ~/.dding/config.json
-      #     [
-      #         {
-      #             "group": "default",
-      #             "secret": "$dding_secret",
-      #             "token": "$dding_token"
-      #         }
-      #     ]
-      #     EOF
+      - name: Install dding on non-Windows
+        if: runner.os != 'Windows'
+        run: |
+          pip install dding
+          mkdir -p ~/.dding
+          dding_secret="${{ github.event.client_payload.dding_secret || secrets.DEFAULT_DDING_SECRET }}"
+          dding_token="${{ github.event.client_payload.dding_token || secrets.DEFAULT_DDING_TOKEN }}"
+          cat <<EOF > ~/.dding/config.json
+          [
+              {
+                  "group": "default",
+                  "secret": "$dding_secret",
+                  "token": "$dding_token"
+              }
+          ]
+          EOF
 
-      # - name: Install dding on Windows
-      #   if: runner.os == 'Windows'
-      #   shell: pwsh
-      #   run: |
-      #     pip install dding
-      #     New-Item -Path $HOME\.dding -ItemType Directory -Force
-      #     $dding_secret = "${{ github.event.client_payload.dding_secret || env.DEFAULT_DDING_SECRET }}"
-      #     $dding_token = "${{ github.event.client_payload.dding_token || env.DEFAULT_DDING_TOKEN }}"
-      #     $config = @"
-      #     [
-      #         {
-      #             "group": "default",
-      #             "secret": "$dding_secret",
-      #             "token": "$dding_token"
-      #         }
-      #     ]
-      #     "@
-      #     $config | Out-File -FilePath $HOME\.dding\config.json -Encoding utf8
+      - name: Install dding on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          pip install dding
+          New-Item -Path $HOME\.dding -ItemType Directory -Force
+          $dding_secret = "${{ github.event.client_payload.dding_secret || secrets.DEFAULT_DDING_SECRET }}"
+          $dding_token = "${{ github.event.client_payload.dding_token || secrets.DEFAULT_DDING_TOKEN }}"
+          $config = @"
+          [
+              {
+                  "group": "default",
+                  "secret": "$dding_secret",
+                  "token": "$dding_token"
+              }
+          ]
+          "@
+          $config | Out-File -FilePath $HOME\.dding\config.json -Encoding utf8
 
 # 下载代码============================================
       - name: Clone repository from github with trace
