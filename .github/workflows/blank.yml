@@ -192,24 +192,39 @@ jobs:
             exit 1
           }
 
-
-
-      - name: Check Status
-        if: ${{ success() }}
+      - name: Print success message
         shell: pwsh
+        if: success()
         run: |
           $repoName = $env:GITHUB_REPOSITORY.Split('/')[-1]
           Write-Host "Workflow succeeded for $repoName!"
-          # dding "github action success :) for $repoName"
-          
+          dding "github action success :) for $repoName"
 
-      - name: Check Status
-        if: ${{ failure() }}
+      - name: Print failure message
         shell: pwsh
+        if: failure()
         run: |
           $repoName = $env:GITHUB_REPOSITORY.Split('/')[-1]
           Write-Host "Workflow failed for $repoName!"
-          # dding "github action fail :( $repoName"
+          dding "github action fail :( $repoName"
+
+
+      # - name: Check Status
+      #   if: ${{ success() }}
+      #   shell: pwsh
+      #   run: |
+      #     $repoName = $env:GITHUB_REPOSITORY.Split('/')[-1]
+      #     Write-Host "Workflow succeeded for $repoName!"
+      #     # dding "github action success :) for $repoName"
+          
+
+      # - name: Check Status
+      #   if: ${{ failure() }}
+      #   shell: pwsh
+      #   run: |
+      #     $repoName = $env:GITHUB_REPOSITORY.Split('/')[-1]
+      #     Write-Host "Workflow failed for $repoName!"
+      #     # dding "github action fail :( $repoName"
 
       - name: Ls dir
         run: |
