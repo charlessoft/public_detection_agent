@@ -1,0 +1,13 @@
+# Requirements for public detection agent
+
+# No external dependencies required for basic functionality
+# The following are optional dependencies for enhanced features:
+
+# For process monitoring (commented out to avoid dependency issues in testing)
+# psutil>=5.9.0
+
+# For advanced file watching
+# watchdog>=2.0.0
+
+# For testing
+# mock>=4.0.0
